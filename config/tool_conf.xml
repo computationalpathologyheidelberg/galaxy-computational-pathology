@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <toolbox monitor="true">
-  <section name="MyTools" id="mTools">
-    <tool file="myTools/pytorch_dcgan/train.xml" />
+  <section id="cphd_tools" name="CPHD Tools">
+    <tool file="cphd_tools/dcgan/train.xml" />
   </section>
   <section id="getext" name="Get Data">
     <tool file="data_source/upload.xml" />

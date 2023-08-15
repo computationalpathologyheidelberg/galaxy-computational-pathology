@@ -1,0 +1,16 @@
+# pycharm
+.idea
+__pycache__/
+# pip
+Pipfile.lock
+# data input and output folders
+/input
+/output
+# remove later from repo
+model_ResNet152.pt
+build_gan.py
+cgan.py
+infogan.py
+
+
+
