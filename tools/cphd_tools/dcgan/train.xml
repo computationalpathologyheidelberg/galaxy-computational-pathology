@@ -7,9 +7,9 @@
     <requirements>  
         <requirement type="package" version="1.25.2">numpy</requirement>
         <requirement type="package" version="1.11.0">scipy</requirement>
-         <requirement type="package" version="2.0.1">torch</requirement>
-         <requirement type="package" version="2.0.2">torchaudio</requirement>
-         <requirement type="package" version="0.15.2">torchvision</requirement>
+        <requirement type="package" version="2.0.1">torch</requirement>
+        <requirement type="package" version="2.0.2">torchaudio</requirement>
+        <requirement type="package" version="0.15.2">torchvision</requirement>
     </requirements>
     <command detect_errors="aggressive"> 
         <![CDATA[
@@ -32,6 +32,19 @@
         <param argument="--project_name" name="project_name" type="text" value="mnist" label="experiment name" help="." /> 
         <param argument="--project_path" name="project_path" type="text" value="/home/galaxy/projects/galaxy_output/dcgan" label="path to store the project" help="." />
     </inputs>
+{#    <tests>#}
+{#        <test>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <param name="data_path" value="lambda"/>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <param name="batch_sitze" value="128"/>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <param name="batch_size" value="128"/>#}
+{#            <output name="output" value="out.tif" ftype="tiff" compare="sim_size"/>#}
+{#        </test>#}
+{#    </tests>#}
     <outputs>
         <data name="output" format="directory" label="results stored in $project_path"/>
     </outputs>
