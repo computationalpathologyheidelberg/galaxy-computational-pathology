@@ -1,0 +1,56 @@
+<tool id="cphd_dcgan_train"
+      name="DCGAN Training"
+      version="1.0.0"
+      profile="23.1"
+>
+    <description>Train DCGAN on image data</description>
+    <requirements>  
+        <requirement type="package" version="1.25.2">numpy</requirement>
+        <requirement type="package" version="1.11.0">scipy</requirement>
+         <requirement type="package" version="2.0.1">torch</requirement>
+         <requirement type="package" version="2.0.2">torchaudio</requirement>
+         <requirement type="package" version="0.15.2">torchvision</requirement>
+    </requirements>
+    <command detect_errors="aggressive"> 
+        <![CDATA[
+        python '$__tool_directory__/pytorch_dcgan/train.py' --batch_size '$batch_size' --data_path '$data_path' --epoch_num '$epoch_num' --img_chan '$img_chan' --img_dim '$img_dim' --lr '$lr' --project_name '$project_name' --project_path '$project_path'
+        ]]>
+    </command>
+    <inputs>
+        <param argument="--batch_size" name="batch_size" value="128" min="1" max="512" type="integer" label="batch size" help="." />
+        <param argument="--data_path" name="data_path" type="select" label="path to image data">
+        	<option value="lambda">MNIST</option>
+        	<option value="/home/galaxy/sds_hd/sd18a006/DataBaseGlomerulusProjekt/DatabaseClassification/Original" selected="true">Glomerulus</option>
+        </param>
+        <param argument="--epoch_num" name="epoch_num" type="integer" value="5" min="1" max="1000" label="number of epochs" help="." /> 
+        <param argument="--img_chan" name="img_chan" type="select" label="number of image channels">
+        	<option value="1">1</option>
+        	<option value= "3">3</option>
+        </param> 
+        <param argument="--img_dim" name="img_dim" type="integer" value="64" min="8" max="1024" label="image dimension" help="." /> 
+        <param argument="--lr" name="lr" type="float" value="0.0002" label="learning rate" help="." /> 
+        <param argument="--project_name" name="project_name" type="text" value="mnist" label="experiment name" help="." /> 
+        <param argument="--project_path" name="project_path" type="text" value="/home/galaxy/projects/galaxy_output/dcgan" label="path to store the project" help="." />
+    </inputs>
+    <tests>
+        <test>
+            <param name="batch_size" value="128"/>
+            <param name="data_path" value="lambda"/>
+            <param name="batch_size" value="128"/>
+            <param name="batch_sitze" value="128"/>
+            <param name="batch_size" value="128"/>
+            <param name="batch_size" value="128"/>
+            <param name="batch_size" value="128"/>
+            <param name="batch_size" value="128"/>
+            <output name="output" value="out.tif" ftype="tiff" compare="sim_size"/>
+        </test>
+    </tests>
+    <outputs>
+        <data name="output" format="directory" label="results stored in $project_path"/>
+    </outputs>
+    <help>
+        **What it does**
+
+        Trains a DCGAN on image data.
+    </help>
+</tool>
