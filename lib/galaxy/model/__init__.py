@@ -3978,7 +3978,9 @@ class Dataset(Base, StorableObject, Serializable):
         if not getattr(self, "external_extra_files_path", None):
             if self.object_store.exists(self, dir_only=True, extra_dir=self._extra_files_rel_path):
                 return self.object_store.get_filename(self, dir_only=True, extra_dir=self._extra_files_rel_path)
-            return ""
+            return self.object_store.construct_path(
+                self, dir_only=True, extra_dir=self._extra_files_rel_path, in_cache=True
+            )
         else:
             return os.path.abspath(self.external_extra_files_path)
 
@@ -4275,7 +4277,7 @@ def datatype_for_extension(extension, datatypes_registry=None) -> "Data":
     return ret
 
 
-class DatasetInstance(UsesCreateAndUpdateTime, _HasTable):
+class DatasetInstance(RepresentById, UsesCreateAndUpdateTime, _HasTable):
     """A base class for all 'dataset instances', HDAs, LDAs, etc"""
 
     states = Dataset.states
@@ -10743,6 +10745,20 @@ WorkflowInvocationStep.subworkflow_invocation_id = column_property(
 # Set up proxy so that this syntax is possible:
 # <user_obj>.preferences[pref_name] = pref_value
 User.preferences = association_proxy("_preferences", "value", creator=UserPreference)
+
+# Optimized version of getting the current Galaxy session.
+# See https://github.com/sqlalchemy/sqlalchemy/discussions/7638 for approach
+session_partition = select(
+    GalaxySession,
+    func.row_number().over(order_by=GalaxySession.update_time, partition_by=GalaxySession.user_id).label("index"),
+).alias()
+partitioned_session = aliased(GalaxySession, session_partition)
+User.current_galaxy_session = relationship(
+    partitioned_session,
+    primaryjoin=and_(partitioned_session.user_id == User.id, session_partition.c.index < 2),
+    uselist=False,
+    viewonly=True,
+)
 
 
 @event.listens_for(HistoryDatasetCollectionAssociation, "init")

@@ -112,7 +112,7 @@ function removeUpload() {
             <div>
                 <FontAwesomeIcon v-if="fileMode == 'new'" icon="fa-edit" fixed-width />
                 <FontAwesomeIcon v-if="fileMode == 'local'" icon="fa-laptop" fixed-width />
-                <FontAwesomeIcon v-if="fileMode == 'ftp'" icon="fa-folder-open" fixed-width />
+                <FontAwesomeIcon v-if="fileMode == 'url'" icon="fa-folder-open" fixed-width />
             </div>
             <b-input
                 :value="fileName"
@@ -129,6 +129,7 @@ function removeUpload() {
                 :disabled="isDisabled"
                 :options="listExtensions"
                 placeholder="Select Type"
+                what="file type"
                 @input="inputExtension" />
             <UploadExtension v-if="listExtensions !== null" :extension="extension" :list-extensions="listExtensions" />
             <UploadSelect
@@ -138,6 +139,7 @@ function removeUpload() {
                 :disabled="isDisabled"
                 :options="listDbKeys"
                 placeholder="Select Reference"
+                what="reference"
                 @input="inputDbKey" />
             <UploadSettings
                 class="upload-settings"
@@ -177,7 +179,7 @@ function removeUpload() {
                 <FontAwesomeIcon v-else icon="fa-exclamation" />
             </div>
         </div>
-        <div v-if="info" v-localize class="upload-info-text">
+        <div v-if="info" v-localize class="upload-text-message font-weight-bold">
             {{ info }}
         </div>
         <div v-if="fileMode == 'new'">

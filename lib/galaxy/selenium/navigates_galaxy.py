@@ -718,9 +718,7 @@ class NavigatesGalaxy(HasDriver):
         except SeleniumTimeoutException as e:
             ui_logged_out = self.components.masthead.logged_out_only.is_displayed
             if ui_logged_out:
-                dom_message = (
-                    "Element a.loggedout-only is present in DOM, indicating Login or Register button still in masthead."
-                )
+                dom_message = "Element a.loggedout-only is present in DOM, indicating Log in or Register button still in masthead."
             else:
                 dom_message = "Element a.loggedout-only is *not* present in DOM."
             user_info = self.api_get("users/current")
@@ -1486,12 +1484,13 @@ class NavigatesGalaxy(HasDriver):
         self.workflow_index_open()
         self.workflow_index_search_for(name)
         self.workflow_click_option(".workflow-run")
+        self.sleep_for(self.wait_types.UX_RENDER)
 
     def workflow_run_specify_inputs(self, inputs: Dict[str, Any]):
         workflow_run = self.components.workflow_run
         for label, value in inputs.items():
             input_div_element = workflow_run.input_data_div(label=label).wait_for_visible()
-            self.select2_set_value(input_div_element, "%d: " % value["hid"])
+            self.select_set_value(input_div_element, "%d: " % value["hid"])
 
     def workflow_run_submit(self):
         self.components.workflow_run.run_workflow.wait_for_and_click()
@@ -1589,8 +1588,10 @@ class NavigatesGalaxy(HasDriver):
         div_element = self.tool_parameter_div(expanded_parameter_id)
         assert div_element
         if expected_type in ["select", "data", "data_collection"]:
-            div_selector = f"div.ui-form-element[id$='form-element-{expanded_parameter_id}']"
-            self.select2_set_value(div_selector, value)
+            select_field = self.components.tool_form.parameter_data_select(
+                parameter=expanded_parameter_id
+            ).wait_for_visible()
+            self.select_set_value(select_field, value)
         else:
             input_element = div_element.find_element(By.CSS_SELECTOR, "input")
             # Clear default value
@@ -1910,7 +1911,7 @@ class NavigatesGalaxy(HasDriver):
         try:
             self.components.masthead.logged_out_only.wait_for_visible()
         except SeleniumTimeoutException as e:
-            message = "Clicked logout button but waiting for 'Login or Registration' button failed, perhaps the logout button was clicked before the handler was setup?"
+            message = "Clicked logout button but waiting for 'Log in or Registration' button failed, perhaps the logout button was clicked before the handler was setup?"
             raise self.prepend_timeout_message(e, message)
         assert (
             not self.is_logged_in()
@@ -2116,11 +2117,27 @@ class NavigatesGalaxy(HasDriver):
         else:
             container_elem = container_selector_or_elem
         container_elem.click()
-        text_input = container_elem.find_element(By.CSS_SELECTOR, "input[class='multiselect__input']")
-        text_input.send_keys(value)
-        self.send_enter(text_input)
-        if multiple:
-            self.send_escape(text_input)
+        try:
+            text_input = container_elem.find_element(By.CSS_SELECTOR, "input[class='multiselect__input']")
+        except Exception:
+            text_input = None
+        if text_input:
+            text_input.send_keys(value)
+            self.send_enter(text_input)
+            if multiple:
+                self.send_escape(text_input)
+        else:
+            self.sleep_for(WAIT_TYPES.UX_RENDER)
+            elems = container_elem.find_elements(By.CSS_SELECTOR, "[role='option'] .multiselect__option span")
+            discovered_options = []
+            found = False
+            for elem in elems:
+                elem_value = elem.text
+                discovered_options.append(elem_value)
+                if elem_value == value:
+                    elem.click()
+                    found = True
+            assert found, f"Failed to find specified select value [{value}] in browser options [{discovered_options}]"
 
     def select2_set_value(self, container_selector_or_elem, value, with_click=True, clear_value=False):
         # There are two hacky was to select things from the select2 widget -

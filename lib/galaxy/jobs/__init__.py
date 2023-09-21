@@ -1025,6 +1025,7 @@ class MinimalJobWrapper(HasResourceParameters):
                 self.job_id,
                 metadata_strategy_override=self.metadata_strategy,
                 tool_id=self.tool.id,
+                tool_type=self.tool.tool_type,
             )
         return self.__external_output_metadata
 
@@ -1764,18 +1765,21 @@ class MinimalJobWrapper(HasResourceParameters):
             metadata_set_successfully = self.external_output_metadata.external_metadata_set_successfully(
                 dataset, output_name, self.sa_session, working_directory=self.working_directory
             )
-            if retry_internally and not metadata_set_successfully:
-                # If Galaxy was expected to sniff type and didn't - do so.
-                if dataset.ext == "_sniff_":
-                    extension = sniff.handle_uploaded_dataset_file(
-                        dataset.dataset.file_name, self.app.datatypes_registry
-                    )
-                    dataset.extension = extension
+            if not metadata_set_successfully:
+                if self.tool.tool_type == "expression":
+                    dataset._state = model.Dataset.states.OK
+                elif retry_internally:
+                    # If Galaxy was expected to sniff type and didn't - do so.
+                    if dataset.ext == "_sniff_":
+                        extension = sniff.handle_uploaded_dataset_file(
+                            dataset.dataset.file_name, self.app.datatypes_registry
+                        )
+                        dataset.extension = extension
 
-                # call datatype.set_meta directly for the initial set_meta call during dataset creation
-                dataset.datatype.set_meta(dataset, overwrite=False)
-            elif job.states.ERROR != final_job_state and not metadata_set_successfully:
-                dataset._state = model.Dataset.states.FAILED_METADATA
+                    # call datatype.set_meta directly for the initial set_meta call during dataset creation
+                    dataset.datatype.set_meta(dataset, overwrite=False)
+                else:
+                    dataset._state = model.Dataset.states.FAILED_METADATA
             else:
                 self.external_output_metadata.load_metadata(
                     dataset,
@@ -1857,7 +1861,7 @@ class MinimalJobWrapper(HasResourceParameters):
             # the tasks failed. So include the stderr, stdout, and exit code:
             return fail()
 
-        extended_metadata = self.external_output_metadata.extended and not self.tool.tool_type == "interactive"
+        extended_metadata = self.external_output_metadata.extended
 
         # We collect the stderr from tools that write their stderr to galaxy.json
         tool_provided_metadata = self.get_tool_provided_job_metadata()
