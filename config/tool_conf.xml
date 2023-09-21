@@ -2,6 +2,7 @@
 <toolbox monitor="true">
   <section id="cphd_tools" name="CPHD Tools">
     <tool file="cphd_tools/dcgan/train.xml" />
+    <tool file="cphd_tools/histoNorm/train.xml" />
   </section>
   <section id="getext" name="Get Data">
     <tool file="data_source/upload.xml" />

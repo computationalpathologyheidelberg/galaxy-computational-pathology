@@ -1,3 +1,6 @@
 [submodule "tools/cphd_tools/dcgan/pytorch_dcgan"]
 	path = tools/cphd_tools/dcgan/pytorch_dcgan
 	url = https://github.com/m4ln/pytorch_dcgan.git
+[submodule "tools/cphd_tools/histoNorm/stainTransfer_CycleGAN_pytorch"]
+	path = tools/cphd_tools/histoNorm/stainTransfer_CycleGAN_pytorch
+	url = https://github.com/m4ln/stainTransfer_CycleGAN_pytorch.git

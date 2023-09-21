@@ -12,6 +12,11 @@ python get-pip.py
 echo "Installing pytorch..."
 pip3 install torch torchvision torchaudio
 
+# Install other requirements
+echo "Installing other requirements..."
+pip3 install dominate
+pip3 install visdom
+
 # Check if the installation was successful
 if [ $? -eq 0 ]; then
     echo "Requirements installed successfully."
